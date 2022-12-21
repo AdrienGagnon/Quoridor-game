@@ -11,6 +11,8 @@ from graphe import construire_graphe
 
 import networkx as nx
 
+import matplotlib.pyplot as plt
+
 
 class Quoridor:
     """Classe pour encapsuler le jeu Quoridor.
@@ -219,10 +221,10 @@ class Quoridor:
         Returns:
             str/bool: Le nom du gagnant si la partie est terminée; False autrement.
         """
-        if self.état["joueurs"][0]["pos"][1] == 9:
-            return self.état["joueurs"][0]["noms"]
-        if self.état["joueurs"][1]["pos"][1] == 1:
-            return self.état["joueurs"][1]["noms"]
+        if self.état["joueurs"]["joueurs"][0]["pos"][1] == 9:
+            return self.état["joueurs"]["joueurs"][0]["noms"]
+        if self.état["joueurs"]["joueurs"][1]["pos"][1] == 1:
+            return self.état["joueurs"]["joueurs"][1]["noms"]
         return False
 
     def récupérer_le_coup(self, joueur):
@@ -308,7 +310,6 @@ class Quoridor:
             ok QuoridorError: La position est invalide pour cette orientation.
             ok QuoridorError: Le joueur a déjà placé tous ses murs.
         """
-        print(self.état)
         if orientation == "horizontal":
             orientation = "horizontaux"
         if orientation == "vertical":
@@ -329,7 +330,6 @@ class Quoridor:
         self.état["joueurs"]["joueurs"][joueur - 1]["murs"] = self.état["joueurs"]["joueurs"][joueur - 1]["murs"] - 1
         #ajouter un murs à la liste
         self.état["joueurs"]["murs"][orientation].append(position)
-        print('selfétat2222', self.état)
         return self.état
 
     def jouer_le_coup(self, joueur):
@@ -355,15 +355,14 @@ class Quoridor:
             raise QuoridorError("La partie est déjà terminée.")
         #Le meilleur coup à jouer
         graphe = construire_graphe(
-            [joueur["pos"] for joueur in self.état["joueurs"]],
+            [joueur["pos"] for joueur in self.état["joueurs"]["joueurs"]],
             self.état["murs"]["horizontaux"],
             self.état["murs"]["verticaux"]
         )
-        if joueur == 1:
-            objectif = {"B1": (5, 10)}
-        else:
-            objectif = {"B1": (5, 0)}
-        chemin = nx.shortest_path(graphe, self.état["joueurs"][joueur - 1]["pos"], "B1")
+        positions = {'B1': (5, 10), 'B2': [5, 0]}
+        chemin = nx.shortest_path(graphe, (self.état["joueurs"]["joueurs"][joueur - 1]["pos"][0], 
+                                        self.état["joueurs"]["joueurs"][joueur - 1]["pos"][1]), "B1")
         #mise à jour position
-        self.état["joueurs"][joueur - 1]["pos"] = chemin[1]
-        return self.état()
+        type_coup = 'D'
+        position = chemin[1]
+        return (type_coup, position)

@@ -44,10 +44,17 @@ if __name__ == "__main__":
             #Automatique et graphique
             id_partie, état = débuter_partie(args.idul, SECRET)
             while True:
+                a = Quoridor(état)
                 # Afficher la partie
-                print(état)
-                # Demander au joueur de choisir son prochain coup
-                type_coup, position = Quoridor.récupérer_le_coup(self)
+                print(a)
+                # Jouer automatiquement le prochain coup
+                type_coup, position = a.jouer_le_coup(1)
+                if type_coup == 'D':
+                    état = a.déplacer_jeton(1, position)
+                if type_coup == 'MH':
+                    état = a.placer_un_mur(1, position, 'horizontal')
+                if type_coup == 'MV':
+                    état = a.placer_un_mur(1, position, 'vertical')
                 # Envoyez le coup au serveur
                 id_partie, état = jouer_coup(
                     id_partie,
@@ -60,11 +67,19 @@ if __name__ == "__main__":
             print('non-graph')
             #Automatique non graphique
             id_partie, état = débuter_partie(args.idul, SECRET)
+            # Instance de la classe
             while True:
+                a = Quoridor(état)
                 # Afficher la partie
-                print(état)
-                # Demander au joueur de choisir son prochain coup
-                type_coup, position = Quoridor.récupérer_le_coup(self)
+                print(a)
+                # Jouer automatiquement le prochain coup
+                type_coup, position = a.jouer_le_coup(1)
+                if type_coup == 'D':
+                    état = a.déplacer_jeton(1, position)
+                if type_coup == 'MH':
+                    état = a.placer_un_mur(1, position, 'horizontal')
+                if type_coup == 'MV':
+                    état = a.placer_un_mur(1, position, 'vertical')
                 # Envoyez le coup au serveur
                 id_partie, état = jouer_coup(
                     id_partie,
@@ -73,17 +88,36 @@ if __name__ == "__main__":
                     args.idul,
                     SECRET,
                 )
-            
     if args.graphique:
         print('graph manuel')
         #Manuel et graphique
-        pass
+        id_partie, état = débuter_partie(args.idul, SECRET)
+        while True:
+            a = Quoridor(état)
+            # Afficher la partie
+            print(a)
+                # Demander au joueur de choisir son prochain coup
+            type_coup, position = a.récupérer_le_coup(1)
+            if type_coup == 'D':
+                état = a.déplacer_jeton(1, position)
+            if type_coup == 'MH':
+                état = a.placer_un_mur(1, position, 'horizontal')
+            if type_coup == 'MV':
+                état = a.placer_un_mur(1, position, 'vertical')
+            # Envoyez le coup au serveur
+            id_partie, état = jouer_coup(
+                id_partie,
+                type_coup,
+                position,
+                args.idul,
+                SECRET,
+            )
     else:
         print('non graph manuel')
         #Manuel non graphique 
         id_partie, état = débuter_partie(args.idul, SECRET)
-        # Instance de la classe
         while True:
+            # Instance de la classe
             a = Quoridor(état)
             # Afficher la partie
             print(a)
@@ -103,6 +137,5 @@ if __name__ == "__main__":
                 args.idul,
                 SECRET,
             )
-            # Faire jouer le coup du serveur et maj self.état
 
-commande_jeu = 'python main.py adgag12'
+commande_jeu = 'python main.py  '

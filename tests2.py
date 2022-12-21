@@ -64,6 +64,6 @@ class App:
         turtle.ontimer(x.go, 0)
 
 
-x = App(800, 600)
+"""x = App(800, 600)
 turtle.ontimer(x.go, 0)
-turtle.mainloop()
+turtle.mainloop()"""
