@@ -123,6 +123,8 @@ class Quoridor:
         Returns:
             str: Chaîne de caractères représentant la légende.
         """
+        if isinstance(self.état['joueurs'], list):
+            self.état = {'joueurs':self.état, 'murs':{'horizontaux':[], 'verticaux':[]}}
         longueur_idul = numero_du_joueur = 0
         for dictio in self.état["joueurs"]["joueurs"]:
             idul = dictio["nom"]

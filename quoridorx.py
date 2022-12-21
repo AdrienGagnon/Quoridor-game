@@ -18,13 +18,14 @@ obligatoirement utiliser le module de la librairie standard nommé turtle. N'uti
 module graphique. Vous trouverez un mini tutoriel sur turtle à l'onglet des documents afférents de ce 
 projet. Si vous rencontrez des difficultés, n'hésitez pas à poser vos questions sur le forum.
 """
+from api import jouer_coup
 from quoridor import Quoridor
 from copy import deepcopy
 import turtle
 
 
 class QuoridorX(Quoridor):
-    def __init__(self, joueurs, murs=None):
+    def __init__(self, joueurs, id_partie, args_idul, SECRET, murs=None):
         """Initialise les variables pour l'afifchage du jeu
         """
         self.état = deepcopy(self.vérification(joueurs, murs))
@@ -33,10 +34,29 @@ class QuoridorX(Quoridor):
         self.joueur_1_stamp = None
         self.joueur_2_stamp = None
         self.turtle.color('black')
-        self.positions_possibles = {1:-267, 2:-200, 3:-133, 2:-66.7, 5:0, 6:66.7, 7:133, 8:200, 9:267}
-        self.positions_possibles_murs_horiz = {1:-300, 2:-200, 3:-100, 2:-33.3,6:33.3, 7:100, 8:166., 9:300}
-        self.positions_possibles_murs_verti = {1:-300, 2:-200, 3:-100, 2:-33.3, 6:33.3, 7:100, 8:166., 9:300}
+        self.grid_size = 600
+        self.positions_possibles = {
+            1:-4 * (self.grid_size / 2) / 4.5, 2:-3 * (self.grid_size / 2) / 4.5,
+            3:-2 * (self.grid_size / 2) / 4.5, 4:-(self.grid_size / 2) / 4.5, 5:0,
+            6:(self.grid_size / 2) / 4.5, 7:2 * (self.grid_size / 2) / 4.5,
+            8:3 * (self.grid_size / 2) / 4.5, 9:4 * (self.grid_size / 2) / 4.5
+        }
+        self.positions_possibles_murs = {
+            1:-self.grid_size / 2,
+            2:(-4 * (self.grid_size / 2) / 4.5) + (((self.grid_size / 2) / 4.5) / 2),
+            3:(-3 * (self.grid_size / 2) / 4.5) + (((self.grid_size / 2) / 4.5) / 2), 
+            4:(-2 * (self.grid_size / 2) / 4.5) + (((self.grid_size / 2) / 4.5) / 2),
+            5:-((self.grid_size / 2) / 4.5) / 2,
+            6:((self.grid_size / 2) / 4.5) / 2,
+            7:(1 * (self.grid_size / 2) / 4.5) + (((self.grid_size / 2) / 4.5) / 2),
+            8:(2 * (self.grid_size / 2) / 4.5) + (((self.grid_size / 2) / 4.5) / 2),
+            9:(3 * (self.grid_size / 2) / 4.5) + (((self.grid_size / 2) / 4.5) / 2)
+        }
         self.clic = None
+        self.id_partie = id_partie
+        self.args_idul = args_idul
+        self.SECRET = SECRET
+        self.numero_du_tour = 0
         """Notez bien que pour les murs horizontaux, nous avons 
         donc les contraintes 1≤x≤8 et 2≤y≤9, mais que pour les murs verticaux, elles sont plutôt 2≤x≤9 et 1≤y≤8.
         """
@@ -44,55 +64,52 @@ class QuoridorX(Quoridor):
     def afficher(self):
         """Affiche la grille du jeu Quoridor à l'écran
         """
-        # Affichage grille
-        GRID_SIZE = 600
-        sub_divisions = 9
-        cell_size = GRID_SIZE / sub_divisions
-        cell_size = GRID_SIZE / float(sub_divisions)
-        self.scn.title("Quoridor")
-        self.scn.setup(width=800, height=800)
-        #cacher le turtle
-        self.turtle.hideturtle()
-        #vitesse maximale
-        self.turtle.speed("fastest")
-        #aller au départ
-        self.turtle.penup()
-        self.turtle.goto(-GRID_SIZE/2, GRID_SIZE/2)
-        self.turtle.pendown()
-        #tracer la grille
-        angle = 90
-        for _ in range(4):
-            self.turtle.forward(GRID_SIZE)
-            self.turtle.right(angle)
-        for _ in range(2):
-            for _ in range(1, sub_divisions):
+        if self.numero_du_tour == 0:
+            # Affichage grille
+            self.grid_size = 600
+            sub_divisions = 9
+            cell_size = self.grid_size / sub_divisions
+            cell_size = self.grid_size / float(sub_divisions)
+            self.scn.title("Quoridor")
+            self.scn.setup(width=800, height=800)
+            #cacher le turtle
+            self.turtle.hideturtle()
+            #vitesse maximale
+            self.turtle.speed("fastest")
+            #aller au départ
+            self.turtle.penup()
+            self.turtle.goto(-self.grid_size/2, self.grid_size/2)
+            self.turtle.pendown()
+            #tracer la grille
+            angle = 90
+            for _ in range(4):
+                self.turtle.forward(self.grid_size)
+                self.turtle.right(angle)
+            for _ in range(2):
+                for _ in range(1, sub_divisions):
+                    self.turtle.forward(cell_size)
+                    self.turtle.right(angle)
+                    self.turtle.forward(self.grid_size)
+                    self.turtle.left(angle)
+                    angle = -angle
                 self.turtle.forward(cell_size)
                 self.turtle.right(angle)
-                self.turtle.forward(GRID_SIZE)
-                self.turtle.left(angle)
-                angle = -angle
-            self.turtle.forward(cell_size)
-            self.turtle.right(angle)
-        # Ajout des chiffres de colonnes et rangées
-        self.turtle.penup()
-        self.turtle.goto(-GRID_SIZE/2 + 35, -GRID_SIZE/2 - 20)
-        for x in range(9):
-            self.turtle.write(f'{x + 1}', move=False, align='center', font=('Arial', 10, 'normal'))
-            self.turtle.setx(-GRID_SIZE/2 + 35 + (x + 1) * 67)
-        self.turtle.goto(-GRID_SIZE/2 - 20, -GRID_SIZE/2 + 25)
-        for x in range(9):
-            self.turtle.write(f'{x + 1}', move=False, align='center', font=('Arial', 10, 'normal'))
-            self.turtle.sety(-GRID_SIZE/2 + 25 + (x + 1) * 67)
+            # Ajout des chiffres de colonnes et rangées
+            self.turtle.penup()
+            self.turtle.goto(-self.grid_size/2 + 35, -self.grid_size/2 - 20)
+            for x in range(9):
+                self.turtle.write(f'{x + 1}', move=False, align='center', font=('Arial', 10, 'normal'))
+                self.turtle.setx(-self.grid_size/2 + 35 + (x + 1) * 67)
+            self.turtle.goto(-self.grid_size/2 - 20, -self.grid_size/2 + 25)
+            for x in range(9):
+                self.turtle.write(f'{x + 1}', move=False, align='center', font=('Arial', 10, 'normal'))
+                self.turtle.sety(-self.grid_size/2 + 25 + (x + 1) * 67)
+        self.numero_du_tour += 1
         #Ajout de la légende au-dessus de la grille
-        self.turtle.goto(-GRID_SIZE/2 + 100, GRID_SIZE/2)
+        self.turtle.goto(-self.grid_size/2 + 100, self.grid_size/2)
         self.turtle.write(self.formater_légende(), move=False, align='center', font=('Arial', 14, 'normal'))
         # Pastille des joueurs
         self.turtle.shape('circle')
-        #supprimer pastille précédente
-        if self.joueur_1_stamp is not None:
-            turtle.clearstamp(self.joueur_1_stamp)
-        if self.joueur_2_stamp is not None:
-            turtle.clearstamp(self.joueur_2_stamp)
         #Appel des fonction pour changer emplacement de la pastille des joueurs
         self.turtle.shapesize(stretch_wid=1.5, stretch_len=1.5, outline=10)
         self.pastille_joueur_1()
@@ -102,46 +119,79 @@ class QuoridorX(Quoridor):
         self.turtle.shapesize(stretch_wid=1.5, stretch_len=1.5, outline=10)
         self.afficher_murs()
         #clicker sur murs ou sur des emplacements vides
-        def remplir(x, y):
-            self.turtle.setposition(x // 800, y)
-            self.turtle.stamp()
-            position = self.turtle.pos()  
-            print(position)
-        
-        self.turtle.onclick(remplir)
+        self.scn.onclick(self.cliquer)
+        self.scn.update()
         self.scn.mainloop()
+        return self.clic
 
     def pastille_joueur_1(self):
+        if self.joueur_1_stamp is not None:
+            self.turtle.clearstamp(self.joueur_1_stamp)
         x = self.état['joueurs']['joueurs'][0]['pos'][0]
         y = self.état['joueurs']['joueurs'][0]['pos'][1]
         self.turtle.setposition(self.positions_possibles[x], self.positions_possibles[y])
         self.turtle.color('blue')
-        joueur_1_stamp = self.turtle.stamp()
-        return joueur_1_stamp
+        self.joueur_1_stamp = self.turtle.stamp()
 
     def pastille_joueur_2(self):
+        if self.joueur_2_stamp is not None:
+            self.turtle.clearstamp(self.joueur_2_stamp)
         x = self.état['joueurs']['joueurs'][1]['pos'][0]
         y = self.état['joueurs']['joueurs'][1]['pos'][1]
         self.turtle.setposition(self.positions_possibles[x], self.positions_possibles[y])
         self.turtle.color('red')
-        joueur_2_stamp = self.turtle.stamp()
-        return joueur_2_stamp
+        self.joueur_2_stamp = self.turtle.stamp()
 
     def afficher_murs(self):
-        pass
+        murs_horizontaux = self.état['joueurs']['murs']['horizontaux']
+        murs_vericaux = self.état['joueurs']['murs']['verticaux']
+        self.turtle.color('black')
+        self.scn.register_shape("rectangle_horizontal", ((5,-5), (5,5), (-5,5), (-5, -5)))
+        self.scn.register_shape("rectangle_verical", ((5,-5), (5,5), (-5,5), (-5, -5)))
+        self.turtle.shape('rectangle_horizontal')
+        for mur in murs_horizontaux:
+            self.turtle.setposition(mur[0], mur[1])
+            self.turtle.stamp()
+        for mur in murs_vericaux:
+            self.turtle.setposition(mur[0], mur[1])
+            self.turtle.stamp()
 
-    def tracerClic(self, x, y):
-        self.sc.onclick(None, btn=1)
-        self.alex.setheading(self.alex.towards(x, y))
-        self.alex.goto(x, y)
-        self.sc.onclick(self.tracerClic, btn=1)
+    def cliquer(self, x, y):
+        #Déplacer la pastille
+        for key, value in self.positions_possibles.items():
+            if value - 15 < x < value + 15:
+                axe_x = key
+                type_coup = 'D'
+            if value - 15 < y < value + 15:
+                axe_y = key
+                type_coup = 'D'
+        for key, value in self.positions_possibles_murs.items():
+            if value - 15 < x < value + 15:
+                axe_x = key
+                type_coup = 'MH'
+            if value - 10 < y < value + 10:
+                axe_y = key
+                type_coup = 'MH'
+        print(axe_x, axe_y)
+        self.turtle.write('alllooo')
+        self.clic = (type_coup, [axe_x, axe_y])
+        self.continuer_partie()
 
-    def changerModeEcriture(self):
-        self.sc.onkeypress(None, 'space')
-        if self.alex.isdown():
-            self.alex.penup()
-            self.alex.fillcolor('white')
-        else:
-            self.alex.pendown()
-            self.alex.fillcolor('black')
-        self.sc.onkeypress(self.changerModeEcriture, 'space')
+    def continuer_partie(self):
+        type_coup, position = self.clic
+        # Demander au joueur de choisir son prochain coup
+        if type_coup == 'D':
+            self.état = self.déplacer_jeton(1, position)
+        if type_coup == 'MH':
+            self.état = self.placer_un_mur(1, position, 'horizontal')
+        if type_coup == 'MV':
+            self.état = self.placer_un_mur(1, position, 'vertical')
+        # Envoyez le coup au serveur
+        self.id_partie, self.état = jouer_coup(
+            self.id_partie,
+            type_coup,
+            position,
+            self.args_idul,
+            self.SECRET,
+        )
+        self.afficher()

@@ -88,12 +88,13 @@ if __name__ == "__main__":
     if args.graphique:
         #Manuel et graphique
         id_partie, état = débuter_partie(args.idul, SECRET)
-        while True:
-            a = QuoridorX(état)
-            # Afficher la partie
-            a.afficher()
+        args_idul = args.idul
+        a = QuoridorX(état, id_partie, args_idul, SECRET)
+        # Afficher la partie
+        a.afficher()
+        def continuer_partie(clic):
+            type_coup, position = clic
             # Demander au joueur de choisir son prochain coup
-            type_coup, position = a.récupérer_le_coup(1)
             if type_coup == 'D':
                 état = a.déplacer_jeton(1, position)
             if type_coup == 'MH':
@@ -108,6 +109,8 @@ if __name__ == "__main__":
                 args.idul,
                 SECRET,
             )
+            a.scn.update()
+            print(état)
     else:
         #Manuel non graphique 
         id_partie, état = débuter_partie(args.idul, SECRET)
