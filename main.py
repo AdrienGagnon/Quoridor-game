@@ -38,9 +38,7 @@ def analyser_commande():
 if __name__ == "__main__":
     args = analyser_commande()
     if args.automatique:
-        print('auto')
         if args.graphique:
-            print('graph')
             #Automatique et graphique
             id_partie, état = débuter_partie(args.idul, SECRET)
             while True:
@@ -64,7 +62,6 @@ if __name__ == "__main__":
                     SECRET,
                 )
         else:
-            print('non-graph')
             #Automatique non graphique
             id_partie, état = débuter_partie(args.idul, SECRET)
             # Instance de la classe
@@ -89,14 +86,13 @@ if __name__ == "__main__":
                     SECRET,
                 )
     if args.graphique:
-        print('graph manuel')
         #Manuel et graphique
         id_partie, état = débuter_partie(args.idul, SECRET)
         while True:
-            a = Quoridor(état)
+            a = QuoridorX(état)
             # Afficher la partie
-            print(a)
-                # Demander au joueur de choisir son prochain coup
+            a.afficher()
+            # Demander au joueur de choisir son prochain coup
             type_coup, position = a.récupérer_le_coup(1)
             if type_coup == 'D':
                 état = a.déplacer_jeton(1, position)
@@ -113,7 +109,6 @@ if __name__ == "__main__":
                 SECRET,
             )
     else:
-        print('non graph manuel')
         #Manuel non graphique 
         id_partie, état = débuter_partie(args.idul, SECRET)
         while True:
@@ -137,5 +132,3 @@ if __name__ == "__main__":
                 args.idul,
                 SECRET,
             )
-
-commande_jeu = 'python main.py  '
