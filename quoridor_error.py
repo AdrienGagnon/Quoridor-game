@@ -4,4 +4,3 @@ class QuoridorError(Exception):
     Args:
         Exception (_type_): _description_
     """
-    pass

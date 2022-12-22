@@ -2,14 +2,13 @@
 
 Ce programme permet de joueur au jeu Quoridor.
 """
+import argparse
 from api import débuter_partie, jouer_coup
 from quoridor import Quoridor
 from quoridorx import QuoridorX
-import argparse
 
 # Mettre ici votre secret récupéré depuis le site de PAX
 SECRET = "af9cf9ec-a74d-401f-a0ac-56161ecf6e3a"
-idul = "adgag12"
 
 
 def analyser_commande():
@@ -80,7 +79,7 @@ if __name__ == "__main__":
         a.afficher()
 
     else:
-        #Manuel non graphique 
+        #Manuel non graphique
         id_partie, état = débuter_partie(args.idul, SECRET)
         while True:
             # Instance de la classe

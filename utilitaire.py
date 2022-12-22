@@ -18,7 +18,7 @@ def analyser_commande():
     """
     parser = argparse.ArgumentParser(description = 'Quoridor')
     parser.add_argument(
-        '-p', '--parties', action="store_true", 
+        '-p', '--parties', action="store_true",
         help='Lister les parties existantes'
     )
     parser.add_argument(
@@ -40,7 +40,7 @@ def formater_les_parties(parties):
     for partie in parties:
         numero_partie += 1
         joueurs_noms = partie["joueurs"]
-        if partie["gagnant"] == None:
+        if partie["gagnant"] is None:
             text.append("{} : {}, {} vs {}".format(
                 numero_partie, partie["date"], joueurs_noms[0], joueurs_noms[1]
             ))

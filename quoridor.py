@@ -42,7 +42,7 @@ class Quoridor:
                 associée à la liste des positions [x, y] des murs verticaux.
         """
         self.état = deepcopy(self.vérification(joueurs, murs))
-    
+
     def vérification(self, joueurs, murs):
         """Vérification d'initialisation d'une instance de la classe Quoridor.
 
@@ -83,7 +83,8 @@ class Quoridor:
                 for joueur in joueurs['joueurs']:
                     if joueur["murs"] < 0 or joueur["murs"] > 10:
                         raise QuoridorError(
-                            "Le nombre de murs qu'un joueur peut placer est plus grand que 10, ou négatif."
+                            """Le nombre de murs qu'un joueur peut placer 
+                            est plus grand que 10, ou négatif."""
                         )
                     position = joueur["pos"]
                     for axe in position:
@@ -175,7 +176,8 @@ class Quoridor:
         for identite in self.état["joueurs"]["joueurs"]:
             numero_du_joueur += 1
             liste_position = identite["pos"]
-            liste[19 - 2 * liste_position[1]][4 + 4 * (liste_position[0] - 1)] = f"{numero_du_joueur}"
+            liste[19 - 2 * liste_position[1]][4 + 
+                4 * (liste_position[0] - 1)] = f"{numero_du_joueur}"
         for couple in self.état["joueurs"]["murs"]["horizontaux"]:
             rangee = 19 - 2 * couple[1]
             colonne = couple[0]
@@ -290,7 +292,8 @@ class Quoridor:
             self.état["murs"]["horizontaux"],
             self.état["murs"]["verticaux"]
         )
-        positions_valides = graphe.successors(tuple(self.état["joueurs"]["joueurs"][joueur - 1]["pos"]))
+        positions_valides = graphe.successors(tuple(
+            self.état["joueurs"]["joueurs"][joueur - 1]["pos"]))
         if not tuple(position) in positions_valides:
             raise QuoridorError("La position est invalide pour l'état actuel du jeu.")
         self.état['joueurs']["joueurs"][joueur - 1]["pos"] = position
@@ -329,7 +332,8 @@ class Quoridor:
         if orientation == "verticaux":
             if position[0] < 2 or position[0] > 9 or position[1] < 1 or position[1] > 8:
                 raise QuoridorError("La position est invalide pour cette orientation.")
-        self.état["joueurs"]["joueurs"][joueur - 1]["murs"] = self.état["joueurs"]["joueurs"][joueur - 1]["murs"] - 1
+        self.état["joueurs"]["joueurs"][joueur - 1]["murs"] = self.état[
+            "joueurs"]["joueurs"][joueur - 1]["murs"] - 1
         #ajouter un murs à la liste
         self.état["joueurs"]["murs"][orientation].append(position)
         return self.état
@@ -362,8 +366,9 @@ class Quoridor:
             self.état['joueurs']["murs"]["verticaux"]
         )
         positions = {'B1': (5, 10), 'B2': [5, 0]}
-        chemin = nx.shortest_path(graphe, (self.état["joueurs"]["joueurs"][joueur - 1]["pos"][0], 
-                                        self.état["joueurs"]["joueurs"][joueur - 1]["pos"][1]), "B1")
+        chemin = nx.shortest_path(graphe, (self.état[
+            "joueurs"]["joueurs"][joueur - 1]["pos"][0], 
+            self.état["joueurs"]["joueurs"][joueur - 1]["pos"][1]), "B1")
         #mise à jour position
         type_coup = 'D'
         position = chemin[1]

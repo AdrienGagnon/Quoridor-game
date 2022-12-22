@@ -3,25 +3,10 @@
 Classes:
     * QuoridorX - Classe pour afficher graphiquement le jeu quoridor.
 """
-
-"""Pour implanter le mode graphique, on vous demande de développer une classe graphique nommée QuoridorX 
-qui hérite de votre classe Quoridor. Votre nouvelle classe doit permettre de faire tout ce que la classe 
-de base peut faire, mais en ajoutant une méthode afficher pour afficher l'état actuel du damier dans une 
-scêtre graphique. Définissez votre classe QuoridorX dans un module nommé quoridorx. 
-
-Prenez garde de ne pas redéfinir inutilement dans QuoridorX ce qui est déjà défini dans Quoridor. Dans le constructeur de 
-QuoridorX, commencez par faire appel au constructeur de Quoridor, puis faites les initialisations nécessaires 
-pour créer la scêtre graphique, puis appelez votre méthode afficher. 
-
-Pour créer votre scêtre graphique et y dessiner un damier avec l'état actuel du jeu, vous devez 
-obligatoirement utiliser le module de la librairie standard nommé turtle. N'utilisez aucun autre 
-module graphique. Vous trouverez un mini tutoriel sur turtle à l'onglet des documents afférents de ce 
-projet. Si vous rencontrez des difficultés, n'hésitez pas à poser vos questions sur le forum.
-"""
+import turtle
 from api import jouer_coup
 from quoridor import Quoridor
 from copy import deepcopy
-import turtle
 
 
 class QuoridorX(Quoridor):
@@ -45,7 +30,7 @@ class QuoridorX(Quoridor):
         self.positions_possibles_murs = {
             1:-self.grid_size / 2,
             2:(-4 * (self.grid_size / 2) / 4.5) + (((self.grid_size / 2) / 4.5) / 2),
-            3:(-3 * (self.grid_size / 2) / 4.5) + (((self.grid_size / 2) / 4.5) / 2), 
+            3:(-3 * (self.grid_size / 2) / 4.5) + (((self.grid_size / 2) / 4.5) / 2),
             4:(-2 * (self.grid_size / 2) / 4.5) + (((self.grid_size / 2) / 4.5) / 2),
             5:-((self.grid_size / 2) / 4.5) / 2,
             6:((self.grid_size / 2) / 4.5) / 2,
@@ -59,9 +44,6 @@ class QuoridorX(Quoridor):
         self.args_automatique = args_automatique
         self.SECRET = SECRET
         self.numero_du_tour = 0
-        """Notez bien que pour les murs horizontaux, nous avons 
-        donc les contraintes 1≤x≤8 et 2≤y≤9, mais que pour les murs verticaux, elles sont plutôt 2≤x≤9 et 1≤y≤8.
-        """
 
     def afficher(self):
         """Affiche la grille du jeu Quoridor à l'écran
@@ -101,16 +83,20 @@ class QuoridorX(Quoridor):
             self.turtle.penup()
             self.turtle.goto(-self.grid_size/2 + 35, -self.grid_size/2 - 20)
             for x in range(9):
-                self.turtle.write(f'{x + 1}', move=False, align='center', font=('Arial', 10, 'normal'))
+                self.turtle.write(f'{x + 1}', move=False, align='center',
+                                font=('Arial', 10, 'normal'))
                 self.turtle.setx(-self.grid_size/2 + 35 + (x + 1) * 67)
             self.turtle.goto(-self.grid_size/2 - 20, -self.grid_size/2 + 25)
             for x in range(9):
-                self.turtle.write(f'{x + 1}', move=False, align='center', font=('Arial', 10, 'normal'))
+                self.turtle.write(f'{x + 1}', move=False, align='center',
+                                font=('Arial', 10, 'normal'))
                 self.turtle.sety(-self.grid_size/2 + 25 + (x + 1) * 67)
             self.turtle.goto(0, 330)
             if self.args_automatique is False:
-                self.turtle.write("""Cliquez sur un mur ou au milieu de la grille\nExemple: Cliquer sur la grille inférieure à (5,6)
-                              place un mur horizontal entre x = 5 et x = 6""")
+                self.turtle.write("""Cliquez sur un mur
+                                 ou au milieu de la grille\nExemple: Cliquer
+                                 sur la grille inférieure à (5,6)
+                             place un mur horizontal entre x = 5 et x = 6""")
         self.numero_du_tour += 1
         if isinstance(self.est_terminée, str):
             self.turtle.goto(0, 0)
@@ -122,7 +108,8 @@ class QuoridorX(Quoridor):
         self.turtle2.penup()
         self.turtle2.clear()
         self.turtle2.goto(-self.grid_size/2 + 20, self.grid_size/2)
-        self.turtle2.write(self.formater_légende(), move=False, align='left', font=('Arial', 14, 'normal'))
+        self.turtle2.write(self.formater_légende(), move=False,
+                        align='left', font=('Arial', 14, 'normal'))
         # Pastille des joueurs
         self.turtle.shape('circle')
         #Appel des fonction pour changer emplacement de la pastille des joueurs
@@ -148,7 +135,8 @@ class QuoridorX(Quoridor):
             self.turtle.clearstamp(self.joueur_1_stamp)
         x = self.état['joueurs']['joueurs'][0]['pos'][0]
         y = self.état['joueurs']['joueurs'][0]['pos'][1]
-        self.turtle.setposition(self.positions_possibles[x], self.positions_possibles[y])
+        self.turtle.setposition(self.positions_possibles[x],
+                                self.positions_possibles[y])
         self.turtle.color('blue')
         self.joueur_1_stamp = self.turtle.stamp()
 
@@ -157,7 +145,8 @@ class QuoridorX(Quoridor):
             self.turtle.clearstamp(self.joueur_2_stamp)
         x = self.état['joueurs']['joueurs'][1]['pos'][0]
         y = self.état['joueurs']['joueurs'][1]['pos'][1]
-        self.turtle.setposition(self.positions_possibles[x], self.positions_possibles[y])
+        self.turtle.setposition(self.positions_possibles[x],
+                                self.positions_possibles[y])
         self.turtle.color('red')
         self.joueur_2_stamp = self.turtle.stamp()
 
@@ -165,15 +154,19 @@ class QuoridorX(Quoridor):
         murs_horizontaux = self.état['joueurs']['murs']['horizontaux']
         murs_vericaux = self.état['joueurs']['murs']['verticaux']
         self.turtle.color('black')
-        self.scn.register_shape("rectangle_horizontal", ((0, -self.grid_size / 15), (0, self.grid_size / 15)))
-        self.scn.register_shape("rectangle_vertical", ((-self.grid_size / 15, 0), (self.grid_size / 15, 0)))
+        self.scn.register_shape("rectangle_horizontal",
+            ((0, -self.grid_size / 15), (0, self.grid_size / 15)))
+        self.scn.register_shape("rectangle_vertical",
+            ((-self.grid_size / 15, 0), (self.grid_size / 15, 0)))
         self.turtle.shape('rectangle_horizontal')
         for mur in murs_horizontaux:
-            self.turtle.setposition(self.positions_possibles_murs[mur[0]] + (self.grid_size / 9), self.positions_possibles_murs[mur[1]])
+            self.turtle.setposition(self.positions_possibles_murs[mur[0]]
+                + (self.grid_size / 9), self.positions_possibles_murs[mur[1]])
             self.turtle.stamp()
         self.turtle.shape('rectangle_vertical')
         for mur in murs_vericaux:
-            self.turtle.setposition(self.positions_possibles_murs[mur[0]], self.positions_possibles_murs[mur[1]] + (self.grid_size / 9))
+            self.turtle.setposition(self.positions_possibles_murs[mur[0]],
+                self.positions_possibles_murs[mur[1]] + (self.grid_size / 9))
             self.turtle.stamp()
 
     def cliquer(self, x, y):

@@ -42,8 +42,7 @@ def lister_parties(idul, secret):
     if rep.status_code == 406:
         rep = rep.json()
         raise RuntimeError(rep.get('message'))
-    else:
-        raise ConnectionError
+    raise ConnectionError
 
 
 def débuter_partie(idul, secret):
@@ -73,8 +72,7 @@ def débuter_partie(idul, secret):
     if rep.status_code == 406:
         rep = rep.json()
         raise RuntimeError(rep.get("message"))
-    else:
-        raise ConnectionError
+    raise ConnectionError
 
 
 def récupérer_partie(id_partie, idul, secret):
@@ -105,8 +103,7 @@ def récupérer_partie(id_partie, idul, secret):
     if rep.status_code == 406:
         rep = rep.json()
         raise RuntimeError(rep.get('message'))
-    else:
-        raise ConnectionError
+    raise ConnectionError
 
 
 def jouer_coup(id_partie, type_coup, position, idul, secret):
@@ -153,5 +150,4 @@ def jouer_coup(id_partie, type_coup, position, idul, secret):
     if rep.status_code == 406:
         rep = rep.json()
         raise RuntimeError(rep.get('message'))
-    else:
-        raise ConnectionError
+    raise ConnectionError
