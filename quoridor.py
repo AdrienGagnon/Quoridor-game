@@ -264,8 +264,7 @@ class Quoridor:
         for x in position:
             if int(x) < 1 or int(x) > 9:
                 raise QuoridorError("La position est invalide (en dehors du damier).")
-            else:
-                nouvelles_positions.append(int(x))
+            nouvelles_positions.append(int(x))
         return (type_coup, nouvelles_positions)
 
     def déplacer_jeton(self, joueur, position):
