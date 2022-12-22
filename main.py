@@ -39,28 +39,13 @@ if __name__ == "__main__":
     args = analyser_commande()
     if args.automatique:
         if args.graphique:
-            #Automatique et graphique
+            #Manuel et graphique
             id_partie, état = débuter_partie(args.idul, SECRET)
-            while True:
-                a = Quoridor(état)
-                # Afficher la partie
-                print(a)
-                # Jouer automatiquement le prochain coup
-                type_coup, position = a.jouer_le_coup(1)
-                if type_coup == 'D':
-                    état = a.déplacer_jeton(1, position)
-                if type_coup == 'MH':
-                    état = a.placer_un_mur(1, position, 'horizontal')
-                if type_coup == 'MV':
-                    état = a.placer_un_mur(1, position, 'vertical')
-                # Envoyez le coup au serveur
-                id_partie, état = jouer_coup(
-                    id_partie,
-                    type_coup,
-                    position,
-                    args.idul,
-                    SECRET,
-                )
+            args_automatique = args.automatique
+            args_idul = args.idul
+            a = QuoridorX(état, id_partie, args_idul, args_automatique, SECRET)
+            # Afficher la partie
+            a.afficher()
         else:
             #Automatique non graphique
             id_partie, état = débuter_partie(args.idul, SECRET)
@@ -88,29 +73,12 @@ if __name__ == "__main__":
     if args.graphique:
         #Manuel et graphique
         id_partie, état = débuter_partie(args.idul, SECRET)
+        args_automatique = args.automatique
         args_idul = args.idul
-        a = QuoridorX(état, id_partie, args_idul, SECRET)
+        a = QuoridorX(état, id_partie, args_idul, args_automatique, SECRET)
         # Afficher la partie
         a.afficher()
-        def continuer_partie(clic):
-            type_coup, position = clic
-            # Demander au joueur de choisir son prochain coup
-            if type_coup == 'D':
-                état = a.déplacer_jeton(1, position)
-            if type_coup == 'MH':
-                état = a.placer_un_mur(1, position, 'horizontal')
-            if type_coup == 'MV':
-                état = a.placer_un_mur(1, position, 'vertical')
-            # Envoyez le coup au serveur
-            id_partie, état = jouer_coup(
-                id_partie,
-                type_coup,
-                position,
-                args.idul,
-                SECRET,
-            )
-            a.scn.update()
-            print(état)
+
     else:
         #Manuel non graphique 
         id_partie, état = débuter_partie(args.idul, SECRET)

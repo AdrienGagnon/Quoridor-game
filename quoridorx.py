@@ -25,7 +25,7 @@ import turtle
 
 
 class QuoridorX(Quoridor):
-    def __init__(self, joueurs, id_partie, args_idul, SECRET, murs=None):
+    def __init__(self, joueurs, id_partie, args_idul, args_automatique, SECRET, murs=None):
         """Initialise les variables pour l'afifchage du jeu
         """
         self.état = deepcopy(self.vérification(joueurs, murs))
@@ -55,6 +55,7 @@ class QuoridorX(Quoridor):
         self.clic = None
         self.id_partie = id_partie
         self.args_idul = args_idul
+        self.args_automatique = args_automatique
         self.SECRET = SECRET
         self.numero_du_tour = 0
         """Notez bien que pour les murs horizontaux, nous avons 
@@ -104,10 +105,13 @@ class QuoridorX(Quoridor):
             for x in range(9):
                 self.turtle.write(f'{x + 1}', move=False, align='center', font=('Arial', 10, 'normal'))
                 self.turtle.sety(-self.grid_size/2 + 25 + (x + 1) * 67)
+            self.turtle.goto(0, 330)
+            self.turtle.write("""Cliquez sur un mur ou au milieu de la grille\nExemple: Cliquer sur la grille inférieure à (5,6)
+                              place un mur horizontal entre x = 5 et x = 6""")
         self.numero_du_tour += 1
         #Ajout de la légende au-dessus de la grille
-        self.turtle.goto(-self.grid_size/2 + 100, self.grid_size/2)
-        self.turtle.write(self.formater_légende(), move=False, align='center', font=('Arial', 14, 'normal'))
+        self.turtle.goto(-self.grid_size/2 + 20, self.grid_size/2)
+        self.turtle.write(self.formater_légende(), move=False, align='left', font=('Arial', 14, 'normal'))
         # Pastille des joueurs
         self.turtle.shape('circle')
         #Appel des fonction pour changer emplacement de la pastille des joueurs
@@ -118,9 +122,17 @@ class QuoridorX(Quoridor):
         #Affichage des murs
         self.turtle.shapesize(stretch_wid=1.5, stretch_len=1.5, outline=10)
         self.afficher_murs()
-        #clicker sur murs ou sur des emplacements vides
-        self.scn.onclick(self.cliquer)
+        #vérifier si automatique ou non
+        if self.args_automatique is False:
+            #clicker sur murs ou sur des emplacements vides
+            self.scn.onclick(self.cliquer)
+        else:
+            self.continuer_partie()
         self.scn.update()
+        if self.est_terminée is not False:
+            self.turtle.goto(0, 0)
+            print(self.est_terminée)
+            self.turtle.write(f'Bravo à {self.est_terminée} pour votre victoire', align='center', font=('Arial', 16, 'normal'))
         self.scn.mainloop()
         return self.clic
 
@@ -146,39 +158,49 @@ class QuoridorX(Quoridor):
         murs_horizontaux = self.état['joueurs']['murs']['horizontaux']
         murs_vericaux = self.état['joueurs']['murs']['verticaux']
         self.turtle.color('black')
-        self.scn.register_shape("rectangle_horizontal", ((5,-5), (5,5), (-5,5), (-5, -5)))
-        self.scn.register_shape("rectangle_verical", ((5,-5), (5,5), (-5,5), (-5, -5)))
+        self.scn.register_shape("rectangle_horizontal", ((0, -self.grid_size / 15), (0, self.grid_size / 15)))
+        self.scn.register_shape("rectangle_vertical", ((-self.grid_size / 15, 0), (self.grid_size / 15, 0)))
         self.turtle.shape('rectangle_horizontal')
         for mur in murs_horizontaux:
-            self.turtle.setposition(mur[0], mur[1])
+            self.turtle.setposition(self.positions_possibles_murs[mur[0]] + (self.grid_size / 9), self.positions_possibles_murs[mur[1]])
             self.turtle.stamp()
+        self.turtle.shape('rectangle_vertical')
         for mur in murs_vericaux:
-            self.turtle.setposition(mur[0], mur[1])
+            self.turtle.setposition(self.positions_possibles_murs[mur[0]], self.positions_possibles_murs[mur[1]] + (self.grid_size / 9))
             self.turtle.stamp()
 
     def cliquer(self, x, y):
         #Déplacer la pastille
+        axe_x = None
+        axe_y = None
+        type_coup = None
+        #mur hori ou verti
         for key, value in self.positions_possibles.items():
             if value - 15 < x < value + 15:
                 axe_x = key
-                type_coup = 'D'
             if value - 15 < y < value + 15:
                 axe_y = key
-                type_coup = 'D'
+        if axe_x is not None and axe_y is not None:
+            type_coup = 'D'
+        for value in self.positions_possibles_murs.values():
+            if value - 15 < y < value + 15:
+                type_coup = 'MH'
+        if type_coup is None:
+            type_coup = 'MV'
         for key, value in self.positions_possibles_murs.items():
             if value - 15 < x < value + 15:
                 axe_x = key
-                type_coup = 'MH'
-            if value - 10 < y < value + 10:
+            if value - 15 < y < value + 15:
                 axe_y = key
-                type_coup = 'MH'
-        print(axe_x, axe_y)
-        self.turtle.write('alllooo')
+        if axe_x is None or axe_y is None:
+            self.turtle.goto(0, 310)
+            self.turtle.write('Assurez-vous de bien cliquer sur un mur ou au milieu de la grille')
+            self.afficher()
         self.clic = (type_coup, [axe_x, axe_y])
         self.continuer_partie()
 
     def continuer_partie(self):
-        type_coup, position = self.clic
+        type_coup, position = self.jouer_le_coup(1)
         # Demander au joueur de choisir son prochain coup
         if type_coup == 'D':
             self.état = self.déplacer_jeton(1, position)
@@ -186,7 +208,7 @@ class QuoridorX(Quoridor):
             self.état = self.placer_un_mur(1, position, 'horizontal')
         if type_coup == 'MV':
             self.état = self.placer_un_mur(1, position, 'vertical')
-        # Envoyez le coup au serveur
+        # Envoyez le coup au serveur        
         self.id_partie, self.état = jouer_coup(
             self.id_partie,
             type_coup,
