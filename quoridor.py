@@ -358,8 +358,8 @@ class Quoridor:
         #Le meilleur coup à jouer
         graphe = construire_graphe(
             [joueur["pos"] for joueur in self.état["joueurs"]["joueurs"]],
-            self.état["murs"]["horizontaux"],
-            self.état["murs"]["verticaux"]
+            self.état['joueurs']["murs"]["horizontaux"],
+            self.état['joueurs']["murs"]["verticaux"]
         )
         positions = {'B1': (5, 10), 'B2': [5, 0]}
         chemin = nx.shortest_path(graphe, (self.état["joueurs"]["joueurs"][joueur - 1]["pos"][0], 

@@ -31,6 +31,7 @@ class QuoridorX(Quoridor):
         self.état = deepcopy(self.vérification(joueurs, murs))
         self.scn = turtle.Screen()
         self.turtle = turtle.Turtle()
+        self.turtle2 = turtle.Turtle()
         self.joueur_1_stamp = None
         self.joueur_2_stamp = None
         self.turtle.color('black')
@@ -65,6 +66,7 @@ class QuoridorX(Quoridor):
     def afficher(self):
         """Affiche la grille du jeu Quoridor à l'écran
         """
+        self.turtle2.hideturtle()
         if self.numero_du_tour == 0:
             # Affichage grille
             self.grid_size = 600
@@ -106,12 +108,21 @@ class QuoridorX(Quoridor):
                 self.turtle.write(f'{x + 1}', move=False, align='center', font=('Arial', 10, 'normal'))
                 self.turtle.sety(-self.grid_size/2 + 25 + (x + 1) * 67)
             self.turtle.goto(0, 330)
-            self.turtle.write("""Cliquez sur un mur ou au milieu de la grille\nExemple: Cliquer sur la grille inférieure à (5,6)
+            if self.args_automatique is False:
+                self.turtle.write("""Cliquez sur un mur ou au milieu de la grille\nExemple: Cliquer sur la grille inférieure à (5,6)
                               place un mur horizontal entre x = 5 et x = 6""")
         self.numero_du_tour += 1
+        if isinstance(self.est_terminée, str):
+            self.turtle.goto(0, 0)
+            self.turtle.write(f'Bravo à {self.est_terminée} pour votre victoire', align='center', font=('Arial', 16, 'normal'))
+            self.scn.listen()
+            if self.turtle.onclick():
+                self.scn.bye()
         #Ajout de la légende au-dessus de la grille
-        self.turtle.goto(-self.grid_size/2 + 20, self.grid_size/2)
-        self.turtle.write(self.formater_légende(), move=False, align='left', font=('Arial', 14, 'normal'))
+        self.turtle2.penup()
+        self.turtle2.clear()
+        self.turtle2.goto(-self.grid_size/2 + 20, self.grid_size/2)
+        self.turtle2.write(self.formater_légende(), move=False, align='left', font=('Arial', 14, 'normal'))
         # Pastille des joueurs
         self.turtle.shape('circle')
         #Appel des fonction pour changer emplacement de la pastille des joueurs
@@ -129,10 +140,6 @@ class QuoridorX(Quoridor):
         else:
             self.continuer_partie()
         self.scn.update()
-        if self.est_terminée is not False:
-            self.turtle.goto(0, 0)
-            print(self.est_terminée)
-            self.turtle.write(f'Bravo à {self.est_terminée} pour votre victoire', align='center', font=('Arial', 16, 'normal'))
         self.scn.mainloop()
         return self.clic
 
@@ -200,15 +207,18 @@ class QuoridorX(Quoridor):
         self.continuer_partie()
 
     def continuer_partie(self):
-        type_coup, position = self.jouer_le_coup(1)
-        # Demander au joueur de choisir son prochain coup
+        if self.args_automatique is True:
+            type_coup, position = self.jouer_le_coup(1)
+        else:
+            type_coup, position = self.clic
+            # Demander au joueur de choisir son prochain coup
         if type_coup == 'D':
             self.état = self.déplacer_jeton(1, position)
         if type_coup == 'MH':
             self.état = self.placer_un_mur(1, position, 'horizontal')
         if type_coup == 'MV':
             self.état = self.placer_un_mur(1, position, 'vertical')
-        # Envoyez le coup au serveur        
+        # Envoyez le coup au serveur
         self.id_partie, self.état = jouer_coup(
             self.id_partie,
             type_coup,
